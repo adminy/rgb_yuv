@@ -1,9 +1,5 @@
-#include <iostream>
 #include <string>
 #include <fstream>
-#include <streambuf>
-#include <cstring>
-#include <math.h>
 
 using namespace std;
 
@@ -64,6 +60,7 @@ int main( int argc, char** argv) {
     unsigned char *rgb = flip((unsigned char*) rgb_pixels.c_str(), 720, 480);
     unsigned char *yuv = rgbToYuv420(720, 480, rgb);
     free(rgb);
+    //write yuv to file
     FILE* out = fopen("test.yuv", "w");
     fwrite(yuv, sizeof(unsigned char), 720 * 480 * 3 / 2, out);
     fclose(out);
