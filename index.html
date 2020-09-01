@@ -1,0 +1,58 @@
+<script>
+const yuv420toRGB = (y, u, v, w, h, dest) => {
+    xpos = 0
+    ypos = 0
+    w2 = w >> 1
+    yoffset = 0
+    uoffset = 0
+    voffset = 0
+    for (i = 0; i < w2 * h; i++) {
+        i2 = i << 1
+        x2 = (xpos << 1)
+        yval = 1.164 * (y[yoffset + x2] - 16)
+        uval = u[uoffset + xpos] - 128
+        vval = v[voffset + xpos] - 128
+        dest[(i2<<2)+0] = yval + 1.5701 * vval
+        dest[(i2<<2)+1] = yval - 0.1870 * vval - 0.4664 * uval
+        dest[(i2<<2)+2] = yval + 1.8556 * uval
+
+        yval = 1.164 * (y[yoffset + x2 + 1] - 16)
+        dest[((i2+1)<<2)+0] = yval + 1.5701 * vval
+        dest[((i2+1)<<2)+1] = yval - 0.1870 * vval - 0.4664 * uval
+        dest[((i2+1)<<2)+2] = yval + 1.8556 * uval
+        dest[(i2<<2)+3] = dest[((i2+1)<<2)+3] = 0xff
+    
+        xpos++
+        if (xpos === w2) {
+            xpos = 0
+            ypos++
+            yoffset += w //stridey
+            uoffset = ((ypos >> 1) * w/2) //strideu
+            voffset = ((ypos >> 1) * w/2) //stridev
+        }
+    }
+}
+
+window.onload = () => {
+    const width = 720, height = 480
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    const img = ctx.getImageData(0, 0, width, height)
+    fetch('test.yuv').then(res => res.arrayBuffer()).then(buff => {
+        const yuv = new Uint8Array(buff)
+        const uOffset = width * height
+        const vOffset = (width / 2) * (height / 2)
+
+        const y = yuv.subarray(0, uOffset)
+        const u = yuv.subarray(uOffset, uOffset + vOffset)
+        const v = yuv.subarray(uOffset + vOffset, yuv.length)
+        
+        yuv420toRGB(y, u, v, width, height, img.data)
+        ctx.putImageData(img, 0, 0)
+
+    })
+    document.body.appendChild(canvas)
+}
+</script>
