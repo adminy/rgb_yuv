@@ -42,8 +42,8 @@ unsigned char* rgbToYuv420(int width, int height, unsigned char* rgb) {
             g = (int)rgb[(j * width + i) * 3 + 1];
             b = (int)rgb[(j * width + i) * 3 + 2];
             y = ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
-            u = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
-            v = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
+            u = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
+            v = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
             ypos = j * width + i;
             upos = (j / 2) * (width / 2) + (i / 2) + length;
             vpos = (j / 2) * (width / 2) + (i / 2) + length + (length / 4);
